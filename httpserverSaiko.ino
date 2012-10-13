@@ -59,13 +59,15 @@ char buf[80];
 
 
 struct HSI {
-  float h1;
-  float h2;
+
   float h;
   float s;
   float i;
   float htarget;
   float starget;
+  float h1;
+  float h2;
+  int mode;
   int pause;
 } color;
 
@@ -85,11 +87,16 @@ void sendcolor() {
   analogWrite(whitePin, rgbw[3]);
 }
 
+typedef enum{FIXED,RANDOM,FADE} MODES;
+
 void setup()
 {
   color.h = 350;
   color.s = 1;
   color.i = .2;
+  color.h1 = 10;
+  color.h2 = 180;
+  color.mode = FIXED; 
   color.htarget = 0;
   color.starget = 1;
   color.pause = 0;
@@ -203,6 +210,7 @@ void loop()
 	    } else if (strncmp_P(buf, PSTR("POST"), 4) == 0) {
 	        /* Form POST */
 	        if (DEBUG) Serial.println(F("Got POST"));
+                turnBlack();
 
 		/* Get posted field value */
                 int match = -1;
@@ -211,25 +219,28 @@ void loop()
                   //wifly.gets(color,FLOAT_SIZE);
                   switch(match) {
                     case 0:
-                      color.h=(float)wifly.parseInt();
+                      color.mode = wifly.parseInt();
                       break;
                     case 1:
-                      color.s=wifly.parseFloat();
+                      color.h=(float)wifly.parseInt();
                       break;
                     case 2:
-                      color.i=wifly.parseFloat();
+                      color.s=wifly.parseFloat();
                       break;
                     case 3:
-                      color.h1=(float)wifly.parseInt();
+                      color.i=wifly.parseFloat();
                       break;
                     case 4:
+                      color.h1=(float)wifly.parseInt();
+                      break;
+                    case 5:
                       color.h2=(float)wifly.parseInt();
                       break;
                     default:
                       break;
                   }
-                  match = wifly.multiMatch_P(100,5,
-                    F("hue="), F("saturation="), F("intensity="),F("huestart="),F("hueend="));
+                  match = wifly.multiMatch_P(100,6,
+                    F("mode="), F("hue="), F("saturation="), F("intensity="),F("huestart="),F("hueend="));
                 } while (match != -1);
                 
                 wifly.flushRx();		// discard rest of input
@@ -264,27 +275,48 @@ void sendGreeting()
      * the message is finished.
      */
     wifly.sendChunkln(F("<html><head>"));
-    //wifly.sendChunkln(F("<script type=\"text/javascript\" src=\"http://ajax.googleapis.com/ajax/libs/jquery/1.3/jquery.min.js\"></script>"));
+    wifly.sendChunkln(F("<script type=\"text/javascript\" src=\"http://ajax.googleapis.com/ajax/libs/jquery/1.3/jquery.min.js\"></script>"));
     
     wifly.sendChunkln(F("<style>"));
       //wifly.sendChunkln(F(".slider span{width:50px;float:left;} .slider input{width:250px;margin-left:75px;}"));
-      wifly.sendChunkln(F(".submit{margin-top:30px;margin-left:50px;width:300px;height:80px;font-size:20pt;}"));
-      wifly.sendChunkln(F("body{width:400px;height:300px;margin:100 auto;padding:20px;border:1px dashed grey;}"));
+      wifly.sendChunkln(F(".submit{margin-top:30px;margin-left:50px;width:300px;height:40px;font-size:20pt;}"));
+      wifly.sendChunkln(F("body{width:400px;height:400px;margin:100 auto;padding:20px;border:1px dashed grey;}"));
+
+      wifly.sendChunkln(F("form{margin-top:20px;}"));
 //.hue { width:20px; height: 200px; background: -moz-linear-gradient(top, #ff0000 0%, #ffff00 17%, #00ff00 33%, #00ffff 50%, #0000ff 67%, #ff00ff 83%, #ff0000 100%); background: -ms-linear-gradient(top, #ff0000 0%, #ffff00 17%, #00ff00 33%, #00ffff 50%, #0000ff 67%, #ff00ff 83%, #ff0000 100%);background: -o-linear-gradient(top, #ff0000 0%, #ffff00 17%, #00ff00 33%, #00ffff 50%, #0000ff 67%, #ff00ff 83%, #ff0000 100%); background: -webkit-gradient(linear, left top, left bottom, from(#ff0000), color-stop(0.17, #ffff00), color-stop(0.33, #00ff00), color-stop(0.5, #00ffff), color-stop(0.67, #0000ff), color-stop(0.83, #ff00ff), to(#ff0000));background: -webkit-linear-gradient(top, #ff0000 0%, #ffff00 17%, #00ff00 33%, #00ffff 50%, #0000ff 67%, #ff00ff 83%, #ff0000 100%);}
-      wifly.sendChunkln(F(".hue { width:350px; height: 20px; margin:30px 10px 10px 60px; background: -moz-linear-gradient(left, #ff0000 0%, #ffff00 17%, #00ff00 33%, #00ffff 50%, #0000ff 67%, #ff00ff 83%, #ff0000 100%); background: -ms-linear-gradient(left, #ff0000 0%, #ffff00 17%, #00ff00 33%, #00ffff 50%, #0000ff 67%, #ff00ff 83%, #ff0000 100%);background: -o-linear-gradient(left, #ff0000 0%, #ffff00 17%, #00ff00 33%, #00ffff 50%, #0000ff 67%, #ff00ff 83%, #ff0000 100%); background: -webkit-gradient(linear, left bottom, right bottom, from(#ff0000), color-stop(0.17, #ffff00), color-stop(0.33, #00ff00), color-stop(0.5, #00ffff), color-stop(0.67, #0000ff), color-stop(0.83, #ff00ff), to(#ff0000));background: -webkit-linear-gradient(left, #ff0000 0%, #ffff00 17%, #00ff00 33%, #00ffff 50%, #0000ff 67%, #ff00ff 83%, #ff0000 100%);}"));
+      wifly.sendChunkln(F(".hue { width:348px; height: 20px; margin:50px 10px 10px 60px; background: -moz-linear-gradient(left, #ff0000 0%, #ffff00 17%, #00ff00 33%, #00ffff 50%, #0000ff 67%, #ff00ff 83%, #ff0000 100%); background: -ms-linear-gradient(left, #ff0000 0%, #ffff00 17%, #00ff00 33%, #00ffff 50%, #0000ff 67%, #ff00ff 83%, #ff0000 100%);background: -o-linear-gradient(left, #ff0000 0%, #ffff00 17%, #00ff00 33%, #00ffff 50%, #0000ff 67%, #ff00ff 83%, #ff0000 100%); background: -webkit-gradient(linear, left bottom, right bottom, from(#ff0000), color-stop(0.17, #ffff00), color-stop(0.33, #00ff00), color-stop(0.5, #00ffff), color-stop(0.67, #0000ff), color-stop(0.83, #ff00ff), to(#ff0000));background: -webkit-linear-gradient(left, #ff0000 0%, #ffff00 17%, #00ff00 33%, #00ffff 50%, #0000ff 67%, #ff00ff 83%, #ff0000 100%);}"));
       wifly.sendChunkln(F(".hue span {position: relative; left: -75px;}"));
       wifly.sendChunkln(F(".hue input {width: 350px;}"));
+      wifly.sendChunkln(F(".center {text-align: center;}"));
+      wifly.sendChunkln(F(".options {margin:0 auto;  }"));
+      wifly.sendChunkln(F(".options label{width:130px;text-align:center;display:inline-block;}"));
+
 
     wifly.sendChunkln(F("</style>"));
     
     wifly.sendChunkln(F("<title>Saikoduino Hacktastic!</title></head>"));
     /* No newlines on the next parts */
-    wifly.sendChunk(F("<h1><p>Hello!</p></h1>"));
+    
+    wifly.sendChunkln(F("<div class='center'>"));
+      wifly.sendChunkln(F("<h1>SaikoLED!</h1>"));
+    
+      if (color.mode == FIXED)
+        wifly.sendChunkln(F("<h2>Solid Color</h2>"));
+      else if (color.mode == RANDOM)
+        wifly.sendChunkln(F("<h2>Auto Fade</h2>"));
+      else if (color.mode == FADE)
+        wifly.sendChunkln(F("<h2>Cross Fade</h2>"));
+      else 
+        wifly.sendChunkln(F("<h2>Unknown Mode</h2>"));
+      
+      if (color.pause)
+        wifly.sendChunkln(F("<div>*PAUSED*</div>"));
+      else
+        wifly.sendChunkln(F("<div>*RUNNING*</div>"));
+    wifly.sendChunkln(F("</div>"));
     
     wifly.sendChunkln(F("<form name=\"input\" action=\"/\" method=\"post\">"));
     
-    if (color.pause)
-      wifly.sendChunkln(F("<div>*PAUSED*</div>"));
 
     char buf[10];
 /*
@@ -304,8 +336,24 @@ void sendGreeting()
     wifly.sendChunkln(F("\"/></div>"));
   */  
     
+    wifly.sendChunkln(F("<script>var hideShow = function(id){console.log(id);return false;}</script>"));
+    wifly.sendChunk(F("<div class='options' id='option-list'>"));
     
+    wifly.sendChunk(F("<label onclick=\"hideShow('sc');\" for='label-sc'><input type=\"radio\" name=\"mode\" value=\"0\" id='label-sc'"));
+    if (color.mode == 0)
+      wifly.sendChunk(" checked=\"checked\"");
+    wifly.sendChunk(F(">Solid Color</label>"));
     
+    wifly.sendChunk(F("<label for='label-af'><input type=\"radio\" name=\"mode\" value=\"1\" id='label-af'"));
+    if (color.mode == 1)
+      wifly.sendChunk(" checked=\"checked\"");
+    wifly.sendChunk(F(">Auto Fade</label>"));
+    
+    wifly.sendChunk(F("<label for='label-cf'><input type=\"radio\" name=\"mode\" value=\"2\" id='label-cf'"));
+    if (color.mode == 2)
+      wifly.sendChunk(" checked=\"checked\"");
+    wifly.sendChunkln(F(">Cross Fade</label></div>"));
+
     wifly.sendChunk(F("<div class='hue'><span>Start Color</span><input type=\"range\" name=\"huestart\" min=0 max=360 step=1 value=\""));
     sprintf(buf,"%d",(int)color.h1);//    dtostrf(color.h,FLOAT_SIZE,0,buf);
     wifly.sendChunk(buf);
@@ -313,7 +361,7 @@ void sendGreeting()
   
     wifly.sendChunk(F("<div class='hue'><span>End Color</span><input type=\"range\" name=\"hueend\" min=0 max=360 step=1 value=\""));
     sprintf(buf,"%d",(int)color.h2);//    dtostrf(color.h,FLOAT_SIZE,0,buf);
-    wifly.sendChunk(buf);
+    wifly.sendChunk(buf);    
     wifly.sendChunkln(F("\"/></div>"));
   
 
@@ -399,7 +447,11 @@ void turnRed(){
    analogWrite(redPin,127);
    delay(500);
 }
-
+void turnBlack(){
+   analogWrite(redPin,0);
+   analogWrite(greenPin,0);
+   analogWrite(bluePin,0);
+}
 
 void flashBlue(){
    analogWrite(redPin,0);
