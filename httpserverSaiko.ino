@@ -41,16 +41,16 @@
 WiFly wifly;
 
 /* Change these to match your WiFi network */
-const char mySSID[] = "ssid";
-const char myPassword[] = "passwordyou";
+const char mySSID[] = "evilcorp";
+const char myPassword[] = "cockknocker";
 
 void sendIndex();
-void sendGreeting(char *name);
+void sendGreeting();
 void send404();
 
 char buf[80];
 
-#define DEBUG 0
+#define DEBUG 1
 #define FLOAT_SIZE 3
   
 #include "math.h"
@@ -59,6 +59,8 @@ char buf[80];
 
 
 struct HSI {
+  float h1;
+  float h2;
   float h;
   float s;
   float i;
@@ -85,9 +87,9 @@ void sendcolor() {
 
 void setup()
 {
-  color.h = 0;
+  color.h = 350;
   color.s = 1;
-  color.i = 1;
+  color.i = .2;
   color.htarget = 0;
   color.starget = 1;
   color.pause = 0;
@@ -105,6 +107,9 @@ void setup()
     Serial.println(wifly.getFreeMemory(),DEC);
   }
     Serial1.begin(115200);
+      while (!Serial1) {
+    ; // wait for serial port to connect. Needed for Leonardo only
+  }
 
     if (DEBUG){ 
       if (!wifly.begin(&Serial1, &Serial)) {
@@ -193,12 +198,10 @@ void loop()
 		    /* Skip rest of request */
 		}
 		//sendIndex();
-                sendGreeting("User");
+                sendGreeting();
 		if (DEBUG) Serial.println(F("Sent index page"));
 	    } else if (strncmp_P(buf, PSTR("POST"), 4) == 0) {
 	        /* Form POST */
-	        char username[16];
-	        //char color[16];
 	        if (DEBUG) Serial.println(F("Got POST"));
 
 		/* Get posted field value */
@@ -216,15 +219,21 @@ void loop()
                     case 2:
                       color.i=wifly.parseFloat();
                       break;
+                    case 3:
+                      color.h1=(float)wifly.parseInt();
+                      break;
+                    case 4:
+                      color.h2=(float)wifly.parseInt();
+                      break;
                     default:
                       break;
                   }
-                  match = wifly.multiMatch_P(100,3,
-                    F("hue="), F("saturation="), F("intensity="));
+                  match = wifly.multiMatch_P(100,5,
+                    F("hue="), F("saturation="), F("intensity="),F("huestart="),F("hueend="));
                 } while (match != -1);
                 
                 wifly.flushRx();		// discard rest of input
-                sendGreeting("User");
+                sendGreeting();
 	    } else {
 	        /* Unexpected request */
 		if (DEBUG)
@@ -240,44 +249,10 @@ void loop()
     }
 }
 
-/** Send an index HTML page with an input box for a username */
-void sendIndex()
-{
-    /* Send the header direclty with print */
-    wifly.println(F("HTTP/1.1 200 OK"));
-    wifly.println(F("Content-Type: text/html"));
-    wifly.println(F("Transfer-Encoding: chunked"));
-    wifly.println();
 
-    /* Send the body using the chunked protocol so the client knows when
-     * the message is finished.
-     * Note: we're not simply doing a close() because in version 2.32
-     * firmware the close() does not work for client TCP streams.
-     */
-    wifly.sendChunkln(F("<html>"));
-    wifly.sendChunkln(F("<title>Saikoduino: Thanks WiFlyHQ!</title>"));
-    wifly.sendChunkln(F("<h1>"));
-    wifly.sendChunkln(F("<p>Hello</p>"));
-    wifly.sendChunkln(F("</h1>"));
-    wifly.sendChunkln(F("<form name=\"input\" action=\"/\" method=\"post\">"));
-    wifly.sendChunkln(F("Username:"));
-    wifly.sendChunkln(F("<input type=\"text\" name=\"user\" />"));
-    wifly.sendChunkln(F("<input type=\"submit\" value=\"Submit\" />"));
-    wifly.sendChunkln(F("</form>")); 
-    wifly.sendChunkln(F("</html>"));
-    wifly.sendChunkln();
-}
-
-
-void webChange()//char *colorName)
-{
-  color.h+=10;
-}
-  
 /** Send a greeting HTML page with the user's name and an analog reading */
-void sendGreeting(char *name)
+void sendGreeting()
 {
-    webChange();
 
     /* Send the header directly with print */
     wifly.println(F("HTTP/1.1 200 OK"));
@@ -290,29 +265,29 @@ void sendGreeting(char *name)
      */
     wifly.sendChunkln(F("<html><head>"));
     //wifly.sendChunkln(F("<script type=\"text/javascript\" src=\"http://ajax.googleapis.com/ajax/libs/jquery/1.3/jquery.min.js\"></script>"));
+    
     wifly.sendChunkln(F("<style>"));
-    wifly.sendChunkln(F(".slider span{width:50px;float:left;} .slider input{width:250px;margin-left:75px;}"));
-    wifly.sendChunkln(F(".submit{margin-top:30px;margin-left:50px;width:300px;height:80px;font-size:20pt;}"));
-    wifly.sendChunkln(F("body{width:400px;height:300px;margin:100 auto;padding:20px;border:1px dashed grey;}"));
-    wifly.sendChunkln(F("</style>"));
-    wifly.sendChunkln(F("<title>Saikoduino Control: Thanks WiFlyHQ!</title></head>"));
-    /* No newlines on the next parts */
-    wifly.sendChunk(F("<h1><p>Hello "));
-    wifly.sendChunk(name);
-    /* Finish the paragraph and heading */
-    wifly.sendChunkln(F("</p></h1>"));
+      //wifly.sendChunkln(F(".slider span{width:50px;float:left;} .slider input{width:250px;margin-left:75px;}"));
+      wifly.sendChunkln(F(".submit{margin-top:30px;margin-left:50px;width:300px;height:80px;font-size:20pt;}"));
+      wifly.sendChunkln(F("body{width:400px;height:300px;margin:100 auto;padding:20px;border:1px dashed grey;}"));
+//.hue { width:20px; height: 200px; background: -moz-linear-gradient(top, #ff0000 0%, #ffff00 17%, #00ff00 33%, #00ffff 50%, #0000ff 67%, #ff00ff 83%, #ff0000 100%); background: -ms-linear-gradient(top, #ff0000 0%, #ffff00 17%, #00ff00 33%, #00ffff 50%, #0000ff 67%, #ff00ff 83%, #ff0000 100%);background: -o-linear-gradient(top, #ff0000 0%, #ffff00 17%, #00ff00 33%, #00ffff 50%, #0000ff 67%, #ff00ff 83%, #ff0000 100%); background: -webkit-gradient(linear, left top, left bottom, from(#ff0000), color-stop(0.17, #ffff00), color-stop(0.33, #00ff00), color-stop(0.5, #00ffff), color-stop(0.67, #0000ff), color-stop(0.83, #ff00ff), to(#ff0000));background: -webkit-linear-gradient(top, #ff0000 0%, #ffff00 17%, #00ff00 33%, #00ffff 50%, #0000ff 67%, #ff00ff 83%, #ff0000 100%);}
+      wifly.sendChunkln(F(".hue { width:350px; height: 20px; margin:30px 10px 10px 60px; background: -moz-linear-gradient(left, #ff0000 0%, #ffff00 17%, #00ff00 33%, #00ffff 50%, #0000ff 67%, #ff00ff 83%, #ff0000 100%); background: -ms-linear-gradient(left, #ff0000 0%, #ffff00 17%, #00ff00 33%, #00ffff 50%, #0000ff 67%, #ff00ff 83%, #ff0000 100%);background: -o-linear-gradient(left, #ff0000 0%, #ffff00 17%, #00ff00 33%, #00ffff 50%, #0000ff 67%, #ff00ff 83%, #ff0000 100%); background: -webkit-gradient(linear, left bottom, right bottom, from(#ff0000), color-stop(0.17, #ffff00), color-stop(0.33, #00ff00), color-stop(0.5, #00ffff), color-stop(0.67, #0000ff), color-stop(0.83, #ff00ff), to(#ff0000));background: -webkit-linear-gradient(left, #ff0000 0%, #ffff00 17%, #00ff00 33%, #00ffff 50%, #0000ff 67%, #ff00ff 83%, #ff0000 100%);}"));
+      wifly.sendChunkln(F(".hue span {position: relative; left: -75px;}"));
+      wifly.sendChunkln(F(".hue input {width: 350px;}"));
 
+    wifly.sendChunkln(F("</style>"));
+    
+    wifly.sendChunkln(F("<title>Saikoduino Hacktastic!</title></head>"));
+    /* No newlines on the next parts */
+    wifly.sendChunk(F("<h1><p>Hello!</p></h1>"));
+    
     wifly.sendChunkln(F("<form name=\"input\" action=\"/\" method=\"post\">"));
-    /*wifly.sendChunk(F("<input type=\"hidden\" name=\"user\" value=\""));
-    wifly.sendChunk(name);
-    wifly.sendChunkln(F("\"/>"));*/
     
     if (color.pause)
       wifly.sendChunkln(F("<div>*PAUSED*</div>"));
 
-
     char buf[10];
-
+/*
     wifly.sendChunk(F("<div class='slider'><span>Hue</span><input type=\"range\" name=\"hue\" min=0 max=360 step=1 value=\""));
     sprintf(buf,"%d",(int)color.h);//    dtostrf(color.h,FLOAT_SIZE,0,buf);
     wifly.sendChunk(buf);
@@ -327,9 +302,20 @@ void sendGreeting(char *name)
     dtostrf(color.i,FLOAT_SIZE,2,buf);
     wifly.sendChunk(buf);
     wifly.sendChunkln(F("\"/></div>"));
+  */  
     
     
     
+    wifly.sendChunk(F("<div class='hue'><span>Start Color</span><input type=\"range\" name=\"huestart\" min=0 max=360 step=1 value=\""));
+    sprintf(buf,"%d",(int)color.h1);//    dtostrf(color.h,FLOAT_SIZE,0,buf);
+    wifly.sendChunk(buf);
+    wifly.sendChunkln(F("\"/></div>"));
+  
+    wifly.sendChunk(F("<div class='hue'><span>End Color</span><input type=\"range\" name=\"hueend\" min=0 max=360 step=1 value=\""));
+    sprintf(buf,"%d",(int)color.h2);//    dtostrf(color.h,FLOAT_SIZE,0,buf);
+    wifly.sendChunk(buf);
+    wifly.sendChunkln(F("\"/></div>"));
+  
 
     wifly.sendChunkln(F("<input class=\"submit\" type=\"submit\" value=\"Update\" />"));
     wifly.sendChunkln(F("</form>")); 
@@ -413,6 +399,7 @@ void turnRed(){
    analogWrite(redPin,127);
    delay(500);
 }
+
 
 void flashBlue(){
    analogWrite(redPin,0);
