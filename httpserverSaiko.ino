@@ -33,7 +33,9 @@
 #define bluePin 11 
 #define redPin 9 
 #define steptime 1
-
+#define propgain 0.0005 // "Small Constant"
+#define minsaturation 0.3
+#define maxsaturation 0.6
 
 //#include <AltSoftSerial.h>
 //AltSoftSerial wifiSerial(8,9);
@@ -87,7 +89,7 @@ void sendcolor() {
   analogWrite(whitePin, rgbw[3]);
 }
 
-typedef enum{FIXED,RANDOM,FADE} MODES;
+typedef enum{SOLID,AUTO,FADE} MODES;
 
 void setup()
 {
@@ -96,7 +98,7 @@ void setup()
   color.i = .2;
   color.h1 = 10;
   color.h2 = 180;
-  color.mode = FIXED; 
+  color.mode = AUTO; 
   color.htarget = 0;
   color.starget = 1;
   color.pause = 0;
@@ -190,11 +192,13 @@ void loop()
 {
     if (!color.pause){
       switch(color.mode){
-        case FIXED:
+        case SOLID:
           color.h = color.h1;
           break;
-        case RANDOM:
-          //setColor
+        case AUTO:
+          updateHue();
+          updateSaturation();
+          delay(steptime);
           break;
         case FADE:
           //float next = color.h+color.inc;
@@ -204,7 +208,7 @@ void loop()
           break;
       }
       //color.h+=1;
-      //delay(steptime);
+      //
       sendcolor();
     }
   
@@ -314,9 +318,9 @@ void sendGreeting()
     wifly.sendChunkln(F("<div class='center'>"));
       wifly.sendChunkln(F("<h1>SaikoLED!</h1>"));
     
-      if (color.mode == FIXED)
+      if (color.mode == SOLID)
         wifly.sendChunkln(F("<h2>Solid Color</h2>"));
-      else if (color.mode == RANDOM)
+      else if (color.mode == AUTO)
         wifly.sendChunkln(F("<h2>Auto Fade</h2>"));
       else if (color.mode == FADE)
         wifly.sendChunkln(F("<h2>Cross Fade</h2>"));
@@ -474,6 +478,20 @@ void flashBlue(){
    analogWrite(bluePin,0);
 }
 
+void updateHue() {
+  color.htarget += (random(360)-180)*.1;
+  color.htarget = fmod(color.htarget, 360);
+  color.h += propgain*(color.htarget-color.h);
+  color.h = fmod(color.h, 360);
+}
 
+void updateSaturation() {
+  color.starget += (random(10000)-5000)/0.00001;
+  if (color.starget > maxsaturation) color.starget = maxsaturation;
+  else if (color.starget < minsaturation) color.starget = minsaturation;
+  color.s += propgain*(color.starget-color.s);
+  if (color.s > maxsaturation) color.s = maxsaturation;
+  else if (color.s < minsaturation) color.s = minsaturation;
+}
 
                
