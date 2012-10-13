@@ -295,7 +295,7 @@ void sendGreeting()
      * the message is finished.
      */
     wifly.sendChunkln(F("<html><head>"));
-    wifly.sendChunkln(F("<script type=\"text/javascript\" src=\"http://ajax.googleapis.com/ajax/libs/jquery/1.3/jquery.min.js\"></script>"));
+    //wifly.sendChunkln(F("<script type=\"text/javascript\" src=\"http://ajax.googleapis.com/ajax/libs/jquery/1.3/jquery.min.js\"></script>"));
     
     wifly.sendChunkln(F("<style>"));
       //wifly.sendChunkln(F(".slider span{width:50px;float:left;} .slider input{width:250px;margin-left:75px;}"));
@@ -357,20 +357,22 @@ void sendGreeting()
     wifly.sendChunkln(F("\"/></div>"));
   */  
     
-    wifly.sendChunkln(F("<script>var hideShow = function(id){console.log(id);return false;}</script>"));
+    wifly.sendChunk(F("<script>"));
+    wifly.sendChunk(F("var hideShow = function(e){console.log(e);window.e=e;};")); //e.srcTarget.style.display='none';//block
+    wifly.sendChunkln(F("</script>"));
     wifly.sendChunk(F("<div class='options' id='option-list'>"));
     
-    wifly.sendChunk(F("<label onclick=\"hideShow('sc');\" for='label-sc'><input type=\"radio\" name=\"mode\" value=\"0\" id='label-sc'"));
+    wifly.sendChunk(F("<label for='label-sc'><input onclick=\"hideShow(event||window.event);\" type=\"radio\" name=\"mode\" value=\"0\" id='label-sc'"));
     if (color.mode == 0)
       wifly.sendChunk(" checked=\"checked\"");
     wifly.sendChunk(F(">Solid Color</label>"));
     
-    wifly.sendChunk(F("<label for='label-af'><input type=\"radio\" name=\"mode\" value=\"1\" id='label-af'"));
+    wifly.sendChunk(F("<label for='label-af'><input onclick=\"hideShow(event||window.event);\" type=\"radio\" name=\"mode\" value=\"1\" id='label-af'"));
     if (color.mode == 1)
       wifly.sendChunk(" checked=\"checked\"");
     wifly.sendChunk(F(">Auto Fade</label>"));
     
-    wifly.sendChunk(F("<label for='label-cf'><input type=\"radio\" name=\"mode\" value=\"2\" id='label-cf'"));
+    wifly.sendChunk(F("<label for='label-cf'><input onclick=\"hideShow(event||window.event);\" type=\"radio\" name=\"mode\" value=\"2\" id='label-cf'"));
     if (color.mode == 2)
       wifly.sendChunk(" checked=\"checked\"");
     wifly.sendChunkln(F(">Cross Fade</label></div>"));
