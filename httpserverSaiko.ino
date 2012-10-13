@@ -189,6 +189,20 @@ void setup()
 void loop()
 {
     if (!color.pause){
+      switch(color.mode){
+        case FIXED:
+          color.h = color.h1;
+          break;
+        case RANDOM:
+          //setColor
+          break;
+        case FADE:
+          //float next = color.h+color.inc;
+          //if color.h > color.h2
+          break;
+        default:
+          break;
+      }
       //color.h+=1;
       //delay(steptime);
       sendcolor();
