@@ -32,7 +32,7 @@
 #define whitePin 13 
 #define bluePin 11 
 #define redPin 9 
-#define steptime 1
+#define steptime 0
 #define propgain 0.0005 // "Small Constant"
 #define minsaturation 0.3
 #define maxsaturation 0.6
@@ -194,6 +194,8 @@ void loop()
       switch(color.mode){
         case SOLID:
           color.h = color.h1;
+          color.s = 1;
+          color.i = 1;
           break;
         case AUTO:
           updateHue();
@@ -337,6 +339,7 @@ void sendGreeting()
     
 
     char buf[10];
+    
 /*
     wifly.sendChunk(F("<div class='slider'><span>Hue</span><input type=\"range\" name=\"hue\" min=0 max=360 step=1 value=\""));
     sprintf(buf,"%d",(int)color.h);//    dtostrf(color.h,FLOAT_SIZE,0,buf);
@@ -469,6 +472,7 @@ void turnBlack(){
    analogWrite(redPin,0);
    analogWrite(greenPin,0);
    analogWrite(bluePin,0);
+   analogWrite(whitePin,0);
 }
 
 void flashBlue(){
