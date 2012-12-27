@@ -43,15 +43,15 @@
 WiFly wifly;
 
 /* Change these to match your WiFi network */
-const char mySSID[] = "evilcorp";
-const char myPassword[] = "cockknocker";
+const char mySSID[] = "169";
+const char myPassword[] = "minerva22";
 
 void sendIndex();
 void sendGreeting();
 void send404();
 
 char buf[80];
-
+int count_loop;
 #define DEBUG 1
 #define FLOAT_SIZE 3
   
@@ -107,13 +107,13 @@ void setup()
     pinMode(redPin, OUTPUT);
     pinMode(greenPin, OUTPUT);
     pinMode(bluePin, OUTPUT);
-  
+   count_loop = 0;
   
   if (DEBUG){
     Serial.begin(115200);
-    Serial.println(F("Starting"));
-    Serial.print(F("Free memory: "));
-    Serial.println(wifly.getFreeMemory(),DEC);
+    //Serial.println(F("Starting"));
+    //Serial.print(F("Free memory: "));
+    //Serial.println(wifly.getFreeMemory(),DEC);
   }
     Serial1.begin(115200);
       while (!Serial1) {
@@ -220,16 +220,16 @@ void loop()
 	if (wifly.gets(buf, sizeof(buf))) {
 	    if (strncmp_P(buf, PSTR("GET / "), 6) == 0) {
 		/* GET request */
-                if (DEBUG) Serial.println(F("Got GET request"));
+                //if (DEBUG) Serial.println(F("Got GET request"));
 		while (wifly.gets(buf, sizeof(buf)) > 0) {
 		    /* Skip rest of request */
 		}
 		//sendIndex();
                 sendGreeting();
-		if (DEBUG) Serial.println(F("Sent index page"));
+		//if (DEBUG) Serial.println(F("Sent index page"));
 	    } else if (strncmp_P(buf, PSTR("POST"), 4) == 0) {
 	        /* Form POST */
-	        if (DEBUG) Serial.println(F("Got POST"));
+	        //if (DEBUG) Serial.println(F("Got POST"));
                 turnBlack();
 
 		/* Get posted field value */
@@ -266,13 +266,13 @@ void loop()
                 wifly.flushRx();		// discard rest of input
                 sendGreeting();
 	    } else {
-	        /* Unexpected request */
+	        /* Unexpected request 
 		if (DEBUG)
                 {  
                   Serial.print(F("Unexpected: "));
 		  Serial.println(buf);
 		  Serial.println(F("Sending 404"));
-		}
+		}*/
                 wifly.flushRx();		// discard rest of input
 		send404();
 	    }
