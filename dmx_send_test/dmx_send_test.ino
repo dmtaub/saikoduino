@@ -5,13 +5,6 @@
 
 #define steptime 1
 
-// the loop routine runs over and over again forever:
-/*void loop() {
-  delay(1000);               // wait for a second
-  analogWrite(whitePin, 10);  
-
-}
-*/
 #define SIZE 32 // max frame size, if you want to do it this way
 volatile byte dmx_buffer[SIZE]; // allocate buffer space
 
@@ -20,9 +13,9 @@ volatile byte dmx_state = 0; // state tracker
 
 void setup() {
   pinMode(whitePin, OUTPUT);  
+  // Enable output on port to control direction of RS485
   DDRD |= 0x03;
-  DDRB |= 0x04;
-  PORTD &= 0xfc;
+  PORTD |= 0x01;
   
   // initialize uart for data transfer
   UBRR1H = ((F_CPU/250000/16) - 1) >> 8;
@@ -30,6 +23,8 @@ void setup() {
   UCSR1A = 1<<UDRE1;
   UCSR1C = 1<<USBS1 | 1<<UCSZ11 | 1<<UCSZ10; // 2 stop bits,8 data bitss
   UCSR1B = 1<<TXEN1; // turn it on
+
+  sei();
   analogWrite(whitePin,10);
 }
 
@@ -39,6 +34,7 @@ void loop() {
   //analogWrite(greenPin,dmx_buffer[1]);
   //analogWrite(bluePin,dmx_buffer[2]);
   //analogWrite(whitePin,dmx_buffer[3]);
+  
   while(dmx_state); // check if last buffer was sent out
   // fill buffer with some new data
   for (byte i = 0; i < SIZE; i++) {
@@ -50,7 +46,8 @@ void loop() {
 }
 
 
-ISR(USART0_TXC_vect) {
+ISR(USART1_TX_vect) {
+
   // handle data transfers
   // check for state 3 first as its most probable
   if (dmx_state == 3) {
@@ -76,6 +73,7 @@ ISR(USART0_TXC_vect) {
     UCSR1B &= ~(1<<TXCIE1); // disable tx complete interrupt
     UCSR1A |= 1<<TXC1; // clear flag if set
     dmx_state = 0; // reset - bad condition or done
+
   }
 }
 
@@ -88,6 +86,7 @@ void dmx_send() {
   UBRR1L = ((F_CPU/80000/16) - 1);
   UCSR1B |= 1<<TXCIE1; // enable tx complete interrupt
   UDR1 = 0;
+  
 }
 
 /*ISR(USART1_RX_vect) {

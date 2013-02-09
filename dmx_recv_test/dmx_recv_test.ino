@@ -21,7 +21,7 @@ volatile byte dmx_state = 0; // state tracker
 void setup() {
   pinMode(whitePin, OUTPUT);  
   DDRD |= 0x03;
-  DDRB |= 0x04;
+  //DDRB |= 0x04;
   PORTD &= 0xfc;
   
   // initialize uart for data transfer
@@ -39,29 +39,25 @@ void loop() {
   analogWrite(redPin,dmx_buffer[0]);
   analogWrite(greenPin,dmx_buffer[1]);
   analogWrite(bluePin,dmx_buffer[2]);
-  analogWrite(whitePin,dmx_buffer[3]);
+  //analogWrite(whitePin,dmx_buffer[3]);
+  analogWrite(whitePin,0);
 
 }
 
 ISR(USART1_RX_vect) {
 
   // handle data transfers
-  byte temp = UDR1; // get data
   // check if BREAK byte
-  if ((UCSR1A & 0x10) == 0x10){//1<<FE1) {
-    //dmx_state = 1; // set to slot0 byte waiting
-    //PORTB |= 0x04;
-    if (temp) {
-      dmx_state = 0; // error - reset reciever
-    }
-    else {
-      dmx_ptr = 0; // reset buffer pointer to beginning
-      dmx_state = 2; // set to data waiting
-    }
+  //if ((UCSR1A & 0x10) == 0x10){
+    if (UCSR1A &(1<<FE1)) {
+      byte temp = UDR1; // get data 
+      dmx_state = 1; // set to slot0 byte waiting
+      //PORTB |= 0x04;
+    
   }
   // check for state 2 first as its most probable
   else if (dmx_state == 2) {
-    dmx_buffer[dmx_ptr] = temp;
+    dmx_buffer[dmx_ptr] = UDR1;
     dmx_ptr++;
     if (dmx_ptr >= SIZE) {
       dmx_state = 0; // last byte recieved or error
@@ -69,7 +65,7 @@ ISR(USART1_RX_vect) {
   }
   else if (dmx_state == 1) {
     // check if slot0 = 0
-    if (temp) {
+    if (UDR1) {
       dmx_state = 0; // error - reset reciever
     }
     else {
@@ -78,9 +74,10 @@ ISR(USART1_RX_vect) {
     }
   }
   else {
+    byte temp = UDR1;
     dmx_state = 0; // reset - bad condition or done
   }
-     PORTB &= 0xFB;
+  //PORTB &= 0xFB;
 
 }
 
