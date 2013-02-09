@@ -1,5 +1,17 @@
-#define redPin 9    
-#define greenPin 10 
+/* Feb 9 2013
+
+
+dmt@saikoled.com
+
+based on code from
+
+guest@openmusiclabs.com
+
+and GPL3-licensed code from Brian Neltner
+*/
+
+#define redPin 9    // Red LED connected to digital pin 9
+#define greenPin 10// Green LED connected to digital pin 10 
 #define bluePin 11 // Blue LED connected to digital pin 11
 #define whitePin 13 // White LED connected to digital pin 13
 
@@ -304,44 +316,3 @@ void dmx_send() {
   
 }
 
-/*ISR(USART1_RX_vect) {
-
-  // handle data transfers
-  byte temp = UDR1; // get data
-  // check if BREAK byte
-  if ((UCSR1A & 0x10) == 0x10){//1<<FE1) {
-    //dmx_state = 1; // set to slot0 byte waiting
-    //PORTB |= 0x04;
-    if (temp) {
-      dmx_state = 0; // error - reset reciever
-    }
-    else {
-      dmx_ptr = 0; // reset buffer pointer to beginning
-      dmx_state = 2; // set to data waiting
-    }
-  }
-  // check for state 2 first as its most probable
-  else if (dmx_state == 2) {
-    dmx_buffer[dmx_ptr] = temp;
-    dmx_ptr++;
-    if (dmx_ptr >= SIZE) {
-      dmx_state = 0; // last byte recieved or error
-    }
-  }
-  else if (dmx_state == 1) {
-    // check if slot0 = 0
-    if (temp) {
-      dmx_state = 0; // error - reset reciever
-    }
-    else {
-      dmx_ptr = 0; // reset buffer pointer to beginning
-      dmx_state = 2; // set to data waiting
-    }
-  }
-  else {
-    dmx_state = 0; // reset - bad condition or done
-  }
-     PORTB &= 0xFB;
-
-}
-*/

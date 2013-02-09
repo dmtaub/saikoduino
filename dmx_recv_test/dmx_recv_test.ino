@@ -1,5 +1,13 @@
-#define redPin 9    
-#define greenPin 10 
+/* Feb 9 2013
+
+dmt@saikoled.com
+guest@openmusiclabs.com
+
+*/
+
+
+#define redPin 9    // Red LED connected to digital pin 9
+#define greenPin 10// Green LED connected to digital pin 10 
 #define bluePin 11 // Blue LED connected to digital pin 11
 #define whitePin 13 // White LED connected to digital pin 13
 
@@ -19,6 +27,9 @@ volatile unsigned int dmx_ptr = 0;
 volatile byte dmx_state = 0; // state tracker
 
 void setup() {
+  pinMode(redPin, OUTPUT);  
+  pinMode(greenPin, OUTPUT);  
+  pinMode(bluePin, OUTPUT);  
   pinMode(whitePin, OUTPUT);  
   DDRD |= 0x03;
   //DDRB |= 0x04;
