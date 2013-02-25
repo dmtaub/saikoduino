@@ -1,7 +1,7 @@
 /*
 * This sketch demonstrates 16bit PWM fades controllable by IR-activated interrupts
 * Requires IRremote library available at https://github.com/shirriff/Arduino-IRremote
-*
+* Uses Remote/Receiver from Sparkfun IR Control Kit https://www.sparkfun.com/products/10783
 * Copyright 2013,  Daniel Taub                    
 * http://saikoled.com                             
 */
@@ -43,7 +43,7 @@ void checkIr(){
       switch(results.value & 0x0FF) {   
        //      remote topbottom leftright: C,20,21,D,11,10,38
         case 0xC:
-           //light.toggle();
+           light.toggle();
            break;
         case 0x20:
           break;

@@ -1,3 +1,6 @@
 MyKi	KEYWORD1
 hsiSend	KEYWORD2
 rgbwSend	KEYWORD2
+rgbw8Send	KEYWORD2
+setScale	KEYWORD2
+toggle	KEYWORD2

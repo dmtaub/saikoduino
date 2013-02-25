@@ -134,23 +134,24 @@ void MyKi::updateLight()
   WHITE = 0xFF & _w; // Low 8 bits of white PWM.
 }
 void MyKi::scale(){
-  if (_scale == 0)
-   return;
-  else if (_scale < 0)
-   {
+  if (_blackout) { 
+   _r=0;_g=0;_b=0;_w=0; 
+  }
+  else if (_scale == 0) {
+    return; 
+  }
+  else if (_scale < 0) {
      _r = min(0, _r << -_scale);
      _g = min(0, _g << -_scale);
      _b = min(0, _b << -_scale);
      _w = min(0, _w << -_scale);
-   }
-  else 
-   {
+  }
+  else {
      _r = max(_r<<_scale,_r);
      _g = max(_g<<_scale,_g);
      _b = max(_b<<_scale,_b);
      _w = max(_w<<_scale,_w);
-   }
-
+  }
 }
 
 void MyKi::hsi2rgbw(float H, float S, float I) {
@@ -205,7 +206,7 @@ void MyKi::hsi2rgbw(float H, float S, float I) {
   { 
     _r = (0xFFFF*r);
     _g = (0xFFFF*g);
-    _r = (0xFFFF*b);
+    _b = (0xFFFF*b);
     _w = (0x3FFF*w);
   }
   else {
@@ -219,4 +220,8 @@ void MyKi::hsi2rgbw(float H, float S, float I) {
 
 void MyKi::setScale(int scale){
   _scale = min(max(-8,scale),8);
+}
+
+bool MyKi::toggle(){
+  _blackout = !_blackout;
 }
