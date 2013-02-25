@@ -138,17 +138,17 @@ void MyKi::scale(){
    return;
   else if (_scale < 0)
    {
-     _r >>= -_scale;
-     _g >>= -_scale;
-     _b >>= -_scale;
-     _w >>= -_scale;
+     _r = min(0, _r << -_scale);
+     _g = min(0, _g << -_scale);
+     _b = min(0, _b << -_scale);
+     _w = min(0, _w << -_scale);
    }
   else 
    {
-     _r <<= _scale;
-     _g <<= _scale;
-     _b <<= _scale;
-     _w <<= _scale;
+     _r = max(_r<<_scale,_r);
+     _g = max(_g<<_scale,_g);
+     _b = max(_b<<_scale,_b);
+     _w = max(_w<<_scale,_w);
    }
 
 }
