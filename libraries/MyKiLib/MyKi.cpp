@@ -72,9 +72,11 @@ MyKi::MyKi()
 
   // Initial RGB values.
   RED = 0x0000;
+  _r=0x0000;
   GREEN = 0x0000;
+  _g=0x0000;
   BLUE = 0x0000;
-  
+  _b=0x0000;
   // Similar setup for White. Mostly a temporary hack for the rev7
   // since the rev10 will have white connected to timer 3's 16-bit
   // PWM output. Will change for production release.
@@ -88,7 +90,8 @@ MyKi::MyKi()
   // Write to TC4H first also when writing to white OCR4A.
   TC4H = 0x03;
   OCR4C = 0xFF;
-  
+  _w = 0x0000;
+
   // Configuration of Timer 4 Registers.
   TCCR4A = 0b10000010;
   TCCR4B = 0b00000001;
@@ -96,7 +99,7 @@ MyKi::MyKi()
   // Jeez that's a lot of registers. What a fancy timer.  pinMode(pin, OUTPUT);
 }
 
-void MyKi::rgbwSend(int r, int g, int b, int w)
+void MyKi::rgbwSend(unsigned int r, unsigned int g, unsigned int b, unsigned int w)
 {
   _r = r;
   _g = g;
@@ -108,9 +111,9 @@ void MyKi::rgbwSend(int r, int g, int b, int w)
 /* legacy, for 8-bit input */
 void MyKi::rgbw8Send(int r, int g, int b, int w)
 {
-  _r=min(max(r,0),255) << 8;
-  _g=min(max(g,0),255) << 8;
-  _b=min(max(b,0),255) << 8;
+  _r=min(max(r,0),255) << 4;
+  _g=min(max(g,0),255) << 4;
+  _b=min(max(b,0),255) << 4;
   _w=min(max(w,0),255) << 2;
   updateLight();
 
@@ -123,7 +126,7 @@ void MyKi::hsiSend(float h, float s, float v)
 }
 void MyKi::updateLight()
 {
-  scale();
+  //scale();
   RED = _r;
   GREEN = _g;
   BLUE = _b;

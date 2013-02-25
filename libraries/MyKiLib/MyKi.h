@@ -13,7 +13,7 @@ class MyKi
 {
   public:
     MyKi();
-    void rgbwSend(int r,int g,int b,int w);
+    void rgbwSend(unsigned int r,unsigned int g,unsigned int b,unsigned int w);
     void rgbw8Send(int r,int g,int b,int w);
     void hsiSend(float h,float s,float i);
     void setScale(int scale);
