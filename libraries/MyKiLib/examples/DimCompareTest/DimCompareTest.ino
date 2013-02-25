@@ -4,23 +4,21 @@
 #define whitePin 13 // White LED connected to digital pin 13
 
 #include <MyKi.h>
+MyKi light;
 
 // the setup routine runs once when you press reset:
-void setup() {                
-  // initialize the digital pin as an output.
-  analogWrite(redPin,1);
-  analogWrite(greenPin, 1);
-  analogWrite(bluePin, 1);
-  analogWrite(whitePin, 1);
+void setup() {    
+
 }
 
 // the loop routine runs over and over again forever:
 void loop() {
-delay(1000);            // wait for a second
-  analogWrite(redPin,1);
-  analogWrite(greenPin, 1);
-  analogWrite(bluePin, 1);
-  analogWrite(whitePin, 1);
-delay(1000);
+  light.rgbw8Send(1,1,1,0);
+  delay(500);
+  //light.rgbwSend(0,0,0,0);
+  delay(500);
+  //light.rgbwSend(1,1,1,0);
+  delay(1000);            // wait for a second
+
   
 }

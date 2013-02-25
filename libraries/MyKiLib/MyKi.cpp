@@ -10,8 +10,8 @@
   #define bluePin 11 // Blue LED connected to digital pin 11
   #define whitePin 13 // White LED connected to digital pin 13
 ^ will change for production release
+*/
 
-#include "WProgram.h"
 #include "MyKi.h"
 #include "math.h"
 
@@ -26,6 +26,7 @@
 
 MyKi::MyKi()
 {
+  _scale = 0;
   // This section is derived from Brian Neltner's work detailed at
   // http://blog.saikoled.com/post/43165849837/secret-konami-cheat-code-to-high-resolution-pwm-on-your
   
@@ -101,15 +102,26 @@ void MyKi::rgbwSend(int r, int g, int b, int w)
   _g = g;
   _b = b;
   _w = w;
-  send();
+  updateLight();
+}
+
+/* legacy, for 8-bit input */
+void MyKi::rgbw8Send(int r, int g, int b, int w)
+{
+  _r=min(max(r,0),255) << 8;
+  _g=min(max(g,0),255) << 8;
+  _b=min(max(b,0),255) << 8;
+  _w=min(max(w,0),255) << 2;
+  updateLight();
+
 }
 
 void MyKi::hsiSend(float h, float s, float v)
 {
-  hsi2rgb(h,s,v);
-  send();
+  hsi2rgbw(h,s,v);
+  updateLight();
 }
-void MyKi::send()
+void MyKi::updateLight()
 {
   scale();
   RED = _r;
@@ -138,7 +150,7 @@ void MyKi::scale(){
 
 }
 
-void hsi2rgbw(float H, float S, float I) {
+void MyKi::hsi2rgbw(float H, float S, float I) {
   float r, g, b, w;
   float cos_h, cos_1047_h;
   H = fmod(H,360); // cycle H around to 0-360 degrees

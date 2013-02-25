@@ -1,3 +1,3 @@
 MyKi	KEYWORD1
 hsiSend	KEYWORD2
-rgbSend	KEYWORD2
+rgbwSend	KEYWORD2
