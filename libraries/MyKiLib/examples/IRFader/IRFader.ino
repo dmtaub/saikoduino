@@ -1,5 +1,6 @@
 /*
 * This sketch demonstrates 16bit PWM fades controllable by IR-activated interrupts
+* Requires IRremote library available at https://github.com/shirriff/Arduino-IRremote
 *
 * Copyright 2013,  Daniel Taub                    
 * http://saikoled.com                             
@@ -28,7 +29,7 @@ void setup() {
 void loop() {
   checkIr();
   // this function replaces analogWrite for the 4 LED pins, 8 bit PWM simulation
-  light.rgbwSend(1,0,0,0);
+  light.rgbwSend(100,1000,0,0);
   delay(5);
   /// this function allows the full range of integer values to be used for PWM
   //light.rgbwSend(1,0,0,0);
