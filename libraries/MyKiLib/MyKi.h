@@ -12,11 +12,17 @@
 class MyKi
 {
   public:
-    MyKi(int pin);
-    void dot();
-    void dash();
+    MyKi();
+    void rgbwSend(int r,int g,int b,int w);
+    void hsiSend(float h,float s,float i);
+    void setScale(int scale);
   private:
-    int _pin;
+    int _scale;
+    unsigned int _r,_g,_b,_w;
+
+    void send();
+    void scale();
+    void hsi2rgbw(float H, float S, float I);
 };
 
 #endif
