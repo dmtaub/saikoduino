@@ -126,7 +126,7 @@ void MyKi::hsiSend(float h, float s, float v)
 }
 void MyKi::updateLight()
 {
-  //scale();
+  scale();
   RED = _r;
   GREEN = _g;
   BLUE = _b;
@@ -138,17 +138,17 @@ void MyKi::scale(){
    return;
   else if (_scale < 0)
    {
-     _r >> -_scale;
-     _g >> -_scale;
-     _b >> -_scale;
-     _w >> -_scale;
+     _r >>= -_scale;
+     _g >>= -_scale;
+     _b >>= -_scale;
+     _w >>= -_scale;
    }
   else 
    {
-     _r << _scale;
-     _g << _scale;
-     _b << _scale;
-     _w << _scale;
+     _r <<= _scale;
+     _g <<= _scale;
+     _b <<= _scale;
+     _w <<= _scale;
    }
 
 }
@@ -217,3 +217,6 @@ void MyKi::hsi2rgbw(float H, float S, float I) {
   }
 }
 
+void MyKi::setScale(int scale){
+  _scale = min(max(-8,scale),8);
+}
