@@ -1,3 +1,6 @@
 [submodule "libraries/WiFlyHQ"]
 	path = libraries/WiFlyHQ
 	url = https://github.com/harlequin-tech/WiFlyHQ.git
+[submodule "libraries/irremote"]
+	path = libraries/irremote
+	url = https://github.com/shirriff/Arduino-IRremote.git

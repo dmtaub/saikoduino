@@ -37,7 +37,7 @@ void parseMessage(){
    if (item == 4){
      isSerial = true;
      time = millis();
-     light.rgbw8Send(rgbw[0],rgbw[1],rgbw[2],rgbw[3]>>2);
+     light.rgbw8Send(rgbw[0],rgbw[1],rgbw[2],rgbw[3]);
    }
 }
 
