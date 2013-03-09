@@ -17,7 +17,7 @@ class MyKi
     void rgbw8Send(int r,int g,int b,int w);
     void hsiSend(float h,float s,float i);
     void setScale(int scale);
-    bool toggle();
+    bool toggle(int state);
   private:
     bool _blackout;
     int _scale;

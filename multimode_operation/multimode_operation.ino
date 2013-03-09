@@ -285,7 +285,7 @@ void setup() {
   }
   
   // Set initial mode.
-  mode = pastelfade;
+  mode = solidcolor;
   pastelfade_state = pastelfadeinitialize;
 }
 

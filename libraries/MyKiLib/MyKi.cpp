@@ -17,7 +17,7 @@
 
 #define DEG_TO_RAD(X) (M_PI*(X)/180)
 
-#define LINEAR true
+#define LINEAR false
 
 #define RED OCR1A
 #define GREEN OCR1B
@@ -111,10 +111,10 @@ void MyKi::rgbwSend(unsigned int r, unsigned int g, unsigned int b, unsigned int
 /* legacy, for 8-bit input */
 void MyKi::rgbw8Send(int r, int g, int b, int w)
 {
-  _r=min(max(r,0),255) << 4;
-  _g=min(max(g,0),255) << 4;
-  _b=min(max(b,0),255) << 4;
-  _w=min(max(w,0),255) << 2;
+  _r=min(max(r,0),255);_r = (_r << 8) | _r;
+  _g=min(max(g,0),255);_g = (_g << 8) | _g;
+  _b=min(max(b,0),255);_b = (_b << 8) | _b;
+  _w=min(max(w,0),255);_w = (_w << 6) | _w >> 2;
   updateLight();
 
 }
@@ -222,6 +222,9 @@ void MyKi::setScale(int scale){
   _scale = min(max(-8,scale),8);
 }
 
-bool MyKi::toggle(){
-  _blackout = !_blackout;
+bool MyKi::toggle(int state){
+  if (state == -1)
+    _blackout = !_blackout;
+  else 
+    _blackout = !state;
 }

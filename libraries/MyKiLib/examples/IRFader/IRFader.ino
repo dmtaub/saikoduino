@@ -43,7 +43,7 @@ void checkIr(){
       switch(results.value & 0x0FF) {   
        //      remote topbottom leftright: C,20,21,D,11,10,38
         case 0xC:
-           light.toggle();
+           light.toggle(-1);
            break;
         case 0x20:
           break;

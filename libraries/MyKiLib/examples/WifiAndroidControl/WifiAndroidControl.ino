@@ -6,6 +6,7 @@
 */
   
 #include <MyKi.h>
+#define DEBUG false
 
 MyKi light;
 float hue;
@@ -22,8 +23,9 @@ int index=0;
 void setup() {    
   light=MyKi();
   hue = 0;
-  Serial.begin(57600);
+  if (DEBUG) Serial.begin(57600);
   Serial1.begin(9600);
+  time = millis();
 }
 
 void parseMessage(){
@@ -42,29 +44,38 @@ void parseMessage(){
 }
 
 void checkSerial(){ 
-  Serial.flush();
+  if (DEBUG)   Serial.flush();
   char inch = '\0';
-  while (Serial1.available()){
+  int avail = Serial1.available();
+  if ((!avail) && (millis() - time >= 20000))
+  {
+     isSerial=false;
+  }
+  while (avail){
     inch = (Serial1.read());
-    //Serial.write(inch);
+    if (DEBUG) Serial.write(inch);
     if (inch == '\n'){
       index = 0;
       buf[index]=NULL;
     }
     else if (inch == '\r'){
       parseMessage();
+      
     }
     else{
       buf[index]=inch;
       index++;
       buf[index]='\0';
     }
-  }
+  avail = Serial1.available();
+}
 }
 
 void loop() {
   checkSerial();
-  if (isSerial && (millis() - time <= 20000)){}
+  if (isSerial){
+  
+    }
   else{
     light.hsiSend(hue+INC,1,1);
     hue=hue+INC;
